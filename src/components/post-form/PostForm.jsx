@@ -36,15 +36,21 @@ export default function PostForm({ post }) {
             }
         } else {
             const file = await appwriteService.uploadFile(data.image[0]);
-
-            if (file) {
-                const fileId = file.$id;
-                data.featuredImage = fileId;
+            if (file && file.$id) {
+                data.featuredImage = file.$id;
+            } else {
+                console.error('File or file.$id is undefined');
+                return; // or handle the error accordingly
+            }
+            
+            if (userData && userData.$id) {
                 const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id });
-
                 if (dbPost) {
                     navigate(`/post/${dbPost.$id}`);
                 }
+            } else {
+                console.error('userData or userData.$id is undefined');
+                return; // or handle the error accordingly
             }
         }
     };
